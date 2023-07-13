@@ -1,5 +1,12 @@
 <?php
 
+/*
+ * This file is part of the SymfonyCasts DynamicForms package.
+ * Copyright (c) SymfonyCasts <https://symfonycasts.com/>
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfonycasts\DynamicForms;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -95,7 +102,7 @@ class DynamicFormBuilder implements FormBuilderInterface, \IteratorAggregate
         }
     }
 
-    private function initializeListeners(?array $fieldsToConsider = null): void
+    private function initializeListeners(array $fieldsToConsider = null): void
     {
         $registeredFields = [];
         foreach ($this->dependentFieldConfigs as $dynamicField) {
@@ -133,6 +140,7 @@ class DynamicFormBuilder implements FormBuilderInterface, \IteratorAggregate
     public function add(string|FormBuilderInterface $child, string $type = null, array $options = []): static
     {
         $this->builder->add($child, $type, $options);
+
         return $this;
     }
 
@@ -149,6 +157,7 @@ class DynamicFormBuilder implements FormBuilderInterface, \IteratorAggregate
     public function remove(string $name): static
     {
         $this->builder->remove($name);
+
         return $this;
     }
 
@@ -170,240 +179,280 @@ class DynamicFormBuilder implements FormBuilderInterface, \IteratorAggregate
     public function addEventListener(string $eventName, callable $listener, int $priority = 0): static
     {
         $this->builder->addEventListener($eventName, $listener, $priority);
+
         return $this;
     }
 
     public function addEventSubscriber(EventSubscriberInterface $subscriber): static
     {
         $this->builder->addEventSubscriber($subscriber);
+
         return $this;
     }
 
     public function addViewTransformer(DataTransformerInterface $viewTransformer, bool $forcePrepend = false): static
     {
         $this->builder->addViewTransformer($viewTransformer, $forcePrepend);
+
         return $this;
     }
 
     public function resetViewTransformers(): static
     {
         $this->builder->resetViewTransformers();
+
         return $this;
     }
 
     public function addModelTransformer(DataTransformerInterface $modelTransformer, bool $forceAppend = false): static
     {
         $this->builder->addModelTransformer($modelTransformer, $forceAppend);
+
         return $this;
     }
 
     public function resetModelTransformers(): static
     {
         $this->builder->resetModelTransformers();
+
         return $this;
     }
 
     public function setAttribute(string $name, mixed $value): static
     {
         $this->builder->setAttribute($name, $value);
+
         return $this;
     }
 
     public function setAttributes(array $attributes): static
     {
         $this->builder->setAttributes($attributes);
+
         return $this;
     }
 
     public function setDataMapper(?DataMapperInterface $dataMapper): static
     {
         $this->builder->setDataMapper($dataMapper);
+
         return $this;
     }
 
     public function setDisabled(bool $disabled): static
     {
         $this->builder->setDisabled($disabled);
+
         return $this;
     }
 
     public function setEmptyData(mixed $emptyData): static
     {
         $this->builder->setEmptyData($emptyData);
+
         return $this;
     }
 
     public function setErrorBubbling(bool $errorBubbling): static
     {
         $this->builder->setErrorBubbling($errorBubbling);
+
         return $this;
     }
 
     public function setErrorMapping(array $errorMapping): static
     {
         $this->builder->setErrorMapping($errorMapping);
+
         return $this;
     }
 
     public function setHelp(?string $help): static
     {
         $this->builder->setHelp($help);
+
         return $this;
     }
 
     public function setHelpAttr(array $helpAttr): static
     {
         $this->builder->setHelpAttr($helpAttr);
+
         return $this;
     }
 
     public function setHelpHtml(bool $helpHtml): static
     {
         $this->builder->setHelpHtml($helpHtml);
+
         return $this;
     }
 
     public function setInheritData(bool $inheritData): static
     {
         $this->builder->setInheritData($inheritData);
+
         return $this;
     }
 
     public function setInvalidMessage(?string $invalidMessage): static
     {
         $this->builder->setInvalidMessage($invalidMessage);
+
         return $this;
     }
 
     public function setInvalidMessageParameters(array $invalidMessageParameters): static
     {
         $this->builder->setInvalidMessageParameters($invalidMessageParameters);
+
         return $this;
     }
 
     public function setLabel(?string $label): static
     {
         $this->builder->setLabel($label);
+
         return $this;
     }
 
     public function setLabelAttr(array $labelAttr): static
     {
         $this->builder->setLabelAttr($labelAttr);
+
         return $this;
     }
 
     public function setLabelFormat(?string $labelFormat): static
     {
         $this->builder->setLabelFormat($labelFormat);
+
         return $this;
     }
 
     public function setLabelHtml(bool $labelHtml): static
     {
         $this->builder->setLabelHtml($labelHtml);
+
         return $this;
     }
 
     public function setMapped(bool $mapped): static
     {
         $this->builder->setMapped($mapped);
+
         return $this;
     }
 
     public function setMethod(string $method): static
     {
         $this->builder->setMethod($method);
+
         return $this;
     }
 
     public function setOptions(array $options): static
     {
         $this->builder->setOptions($options);
+
         return $this;
     }
 
     public function setPropertyPath(null|string|PropertyPathInterface $propertyPath): static
     {
         $this->builder->setPropertyPath($propertyPath);
+
         return $this;
     }
 
     public function setRequired(bool $required): static
     {
         $this->builder->setRequired($required);
+
         return $this;
     }
 
     public function setRowAttr(array $rowAttr): static
     {
         $this->builder->setRowAttr($rowAttr);
+
         return $this;
     }
 
     public function setTranslationDomain(?string $translationDomain): static
     {
         $this->builder->setTranslationDomain($translationDomain);
+
         return $this;
     }
 
     public function setTrim(bool $trim): static
     {
         $this->builder->setTrim($trim);
+
         return $this;
     }
 
     public function setAction(?string $action): static
     {
         $this->builder->setAction($action);
+
         return $this;
     }
 
     public function setCompound(bool $compound): static
     {
         $this->builder->setCompound($compound);
+
         return $this;
     }
 
     public function setDataClass(?string $dataClass): static
     {
         $this->builder->setDataClass($dataClass);
+
         return $this;
     }
 
     public function setDataLocked(bool $locked): static
     {
         $this->builder->setDataLocked($locked);
+
         return $this;
     }
 
     public function setFormFactory(FormFactoryInterface $formFactory): static
     {
         $this->builder->setFormFactory($formFactory);
+
         return $this;
     }
 
     public function setType(?ResolvedFormTypeInterface $type): static
     {
         $this->builder->setType($type);
+
         return $this;
     }
 
     public function setTypeName(string $typeName): static
     {
         $this->builder->setTypeName($typeName);
+
         return $this;
     }
 
     public function setEventDispatcher(EventDispatcherInterface $dispatcher): static
     {
         $this->builder->setEventDispatcher($dispatcher);
+
         return $this;
     }
 
     public function setRequestHandler(?RequestHandlerInterface $requestHandler): static
     {
         $this->builder->setRequestHandler($requestHandler);
+
         return $this;
     }
 
@@ -595,4 +644,3 @@ class DynamicFormBuilder implements FormBuilderInterface, \IteratorAggregate
         return $this->builder;
     }
 }
-

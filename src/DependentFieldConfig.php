@@ -1,5 +1,12 @@
 <?php
 
+/*
+ * This file is part of the SymfonyCasts DynamicForms package.
+ * Copyright (c) SymfonyCasts <https://symfonycasts.com/>
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfonycasts\DynamicForms;
 
 use Symfony\Component\Form\FormEvents;
@@ -18,8 +25,7 @@ class DependentFieldConfig
         public string $name,
         public array $dependencies,
         public \Closure $callback,
-    )
-    {
+    ) {
     }
 
     public function isReady(array $availableDependencyData, string $eventName): bool
@@ -29,7 +35,7 @@ class DependentFieldConfig
         }
 
         foreach ($this->dependencies as $dependency) {
-            if (!array_key_exists($dependency, $availableDependencyData)) {
+            if (!\array_key_exists($dependency, $availableDependencyData)) {
                 return false;
             }
         }
