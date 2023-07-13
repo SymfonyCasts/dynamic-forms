@@ -49,7 +49,7 @@ class DynamicFormBuilder implements FormBuilderInterface, \IteratorAggregate
         });
     }
 
-    public function addDynamic(string $name, array $dependencies, callable $callback): self
+    public function addDependent(string $name, array $dependencies, callable $callback): self
     {
         $this->dependentFieldConfigs[] = new DependentFieldConfig($name, $dependencies, $callback);
 

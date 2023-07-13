@@ -37,9 +37,9 @@ class DependentFieldConfig
         return true;
     }
 
-    public function execute(array $availableDependencyData, string $eventName): DynamicField
+    public function execute(array $availableDependencyData, string $eventName): DependentField
     {
-        $configurableFormBuilder = new DynamicField();
+        $configurableFormBuilder = new DependentField();
 
         $this->callbackExecuted[$eventName] = true;
         $dependencyData = array_map(fn (string $dependency) => $availableDependencyData[$dependency], $this->dependencies);

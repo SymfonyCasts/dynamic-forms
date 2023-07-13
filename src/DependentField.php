@@ -3,11 +3,11 @@
 namespace Symfonycasts\DynamicForms;
 
 /**
- * Used to configure a dynamic field.
+ * Used to configure a dependent/dynamic field.
  *
  * If ->add() is not called, the field won't be included.
  */
-class DynamicField
+class DependentField
 {
     private ?string $type = null;
     private array $options = [];
