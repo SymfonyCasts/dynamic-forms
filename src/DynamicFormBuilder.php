@@ -260,79 +260,9 @@ class DynamicFormBuilder implements FormBuilderInterface, \IteratorAggregate
         return $this;
     }
 
-    public function setErrorMapping(array $errorMapping): static
-    {
-        $this->builder->setErrorMapping($errorMapping);
-
-        return $this;
-    }
-
-    public function setHelp(?string $help): static
-    {
-        $this->builder->setHelp($help);
-
-        return $this;
-    }
-
-    public function setHelpAttr(array $helpAttr): static
-    {
-        $this->builder->setHelpAttr($helpAttr);
-
-        return $this;
-    }
-
-    public function setHelpHtml(bool $helpHtml): static
-    {
-        $this->builder->setHelpHtml($helpHtml);
-
-        return $this;
-    }
-
     public function setInheritData(bool $inheritData): static
     {
         $this->builder->setInheritData($inheritData);
-
-        return $this;
-    }
-
-    public function setInvalidMessage(?string $invalidMessage): static
-    {
-        $this->builder->setInvalidMessage($invalidMessage);
-
-        return $this;
-    }
-
-    public function setInvalidMessageParameters(array $invalidMessageParameters): static
-    {
-        $this->builder->setInvalidMessageParameters($invalidMessageParameters);
-
-        return $this;
-    }
-
-    public function setLabel(?string $label): static
-    {
-        $this->builder->setLabel($label);
-
-        return $this;
-    }
-
-    public function setLabelAttr(array $labelAttr): static
-    {
-        $this->builder->setLabelAttr($labelAttr);
-
-        return $this;
-    }
-
-    public function setLabelFormat(?string $labelFormat): static
-    {
-        $this->builder->setLabelFormat($labelFormat);
-
-        return $this;
-    }
-
-    public function setLabelHtml(bool $labelHtml): static
-    {
-        $this->builder->setLabelHtml($labelHtml);
 
         return $this;
     }
@@ -351,13 +281,6 @@ class DynamicFormBuilder implements FormBuilderInterface, \IteratorAggregate
         return $this;
     }
 
-    public function setOptions(array $options): static
-    {
-        $this->builder->setOptions($options);
-
-        return $this;
-    }
-
     public function setPropertyPath(null|string|PropertyPathInterface $propertyPath): static
     {
         $this->builder->setPropertyPath($propertyPath);
@@ -372,27 +295,6 @@ class DynamicFormBuilder implements FormBuilderInterface, \IteratorAggregate
         return $this;
     }
 
-    public function setRowAttr(array $rowAttr): static
-    {
-        $this->builder->setRowAttr($rowAttr);
-
-        return $this;
-    }
-
-    public function setTranslationDomain(?string $translationDomain): static
-    {
-        $this->builder->setTranslationDomain($translationDomain);
-
-        return $this;
-    }
-
-    public function setTrim(bool $trim): static
-    {
-        $this->builder->setTrim($trim);
-
-        return $this;
-    }
-
     public function setAction(?string $action): static
     {
         $this->builder->setAction($action);
@@ -403,13 +305,6 @@ class DynamicFormBuilder implements FormBuilderInterface, \IteratorAggregate
     public function setCompound(bool $compound): static
     {
         $this->builder->setCompound($compound);
-
-        return $this;
-    }
-
-    public function setDataClass(?string $dataClass): static
-    {
-        $this->builder->setDataClass($dataClass);
 
         return $this;
     }
@@ -431,20 +326,6 @@ class DynamicFormBuilder implements FormBuilderInterface, \IteratorAggregate
     public function setType(?ResolvedFormTypeInterface $type): static
     {
         $this->builder->setType($type);
-
-        return $this;
-    }
-
-    public function setTypeName(string $typeName): static
-    {
-        $this->builder->setTypeName($typeName);
-
-        return $this;
-    }
-
-    public function setEventDispatcher(EventDispatcherInterface $dispatcher): static
-    {
-        $this->builder->setEventDispatcher($dispatcher);
 
         return $this;
     }
