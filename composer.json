@@ -1,0 +1,33 @@
+{
+    "name": "symfonycasts/dynamic-forms",
+    "description": "Add dynamic/dependent fields to Symfony forms",
+    "license": "MIT",
+    "type": "library",
+    "keywords": ["symfony", "forms"],
+    "authors": [
+        {
+            "name": "Ryan Weaver",
+            "homepage": "https://symfonycasts.com"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "symfony/form": "^6.3"
+    },
+    "require-dev": {
+        "symfony/framework-bundle": "^6.3",
+        "symfony/phpunit-bridge": "^6.3",
+        "phpstan/phpstan": "1.11.x-dev"
+    },
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-4": {
+            "Symfonycasts\\DynamicForms\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Symfonycasts\\DynamicForms\\Tests\\": "tests/"
+        }
+    }
+}

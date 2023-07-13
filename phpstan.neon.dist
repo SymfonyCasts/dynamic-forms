@@ -1,0 +1,9 @@
+parameters:
+    level: 4
+    paths:
+        - src
+    ignoreErrors:
+        -
+            message: "#^Call to an undefined method Symfony\\\\Component\\\\Config\\\\Definition\\\\Builder\\\\NodeParentInterface\\:\\:scalarNode\\(\\)\\.$#"
+            count: 1
+            path: src/DependencyInjection/TailwindExtension.php

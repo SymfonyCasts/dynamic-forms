@@ -1,0 +1,31 @@
+name: CI
+
+on:
+    pull_request: ~
+    push:
+        branches: ['main']
+    schedule:
+        - cron: '0 */12 * * *'
+
+jobs:
+    test:
+        uses: SymfonyCasts/.github/.github/workflows/phpunit.yaml@main
+        with:
+            php-version-matrix: '["8.1", "8.2"]'
+            php-version-lowest: '8.1'
+
+    test_windows:
+        uses: SymfonyCasts/.github/.github/workflows/phpunit.yaml@main
+        with:
+            php-version-matrix: '["8.2"]'
+            php-version-lowest: '8.2'
+            runs-on: windows-latest
+
+    composer-validate:
+        uses: SymfonyCasts/.github/.github/workflows/composer-validate.yaml@main
+
+    cs:
+        uses: SymfonyCasts/.github/.github/workflows/php-cs-fixer.yaml@main
+
+    sca:
+        uses: SymfonyCasts/.github/.github/workflows/phpstan.yaml@main
