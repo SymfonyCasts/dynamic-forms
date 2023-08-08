@@ -124,7 +124,6 @@ class DynamicFormBuilder implements FormBuilderInterface, \IteratorAggregate
             if ($form->get('__dynamic_error')->isValid()) {
                 $form->get('__dynamic_error')->addError(new FormError('Some dynamic fields have errors.'));
             }
-            dump($form);
         }
     }
 

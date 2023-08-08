@@ -17,7 +17,9 @@
     "require-dev": {
         "symfony/framework-bundle": "^6.3",
         "symfony/phpunit-bridge": "^6.3",
-        "phpstan/phpstan": "1.11.x-dev"
+        "phpstan/phpstan": "1.11.x-dev",
+        "zenstruck/browser": "1.x-dev",
+        "symfony/twig-bundle": "7.0.x-dev"
     },
     "minimum-stability": "dev",
     "autoload": {

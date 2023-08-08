@@ -1,0 +1,7 @@
+Is Form Valid: {{ isFormValid ? 'yes' : 'no' }}
+
+{{ form_start(form) }}
+    {{ form_widget(form) }}
+
+    <button type="submit">Submit Form</button>
+{{ form_end(form) }}
