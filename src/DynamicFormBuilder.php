@@ -11,10 +11,13 @@ namespace Symfonycasts\DynamicForms;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\ClearableErrorsInterface;
 use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\DataTransformerInterface;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormConfigInterface;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -49,11 +52,29 @@ class DynamicFormBuilder implements FormBuilderInterface, \IteratorAggregate
             $this->form = $event->getForm();
             $this->preSetDataDependencyData = [];
             $this->initializeListeners();
+
+            // A fake hidden field where we can "store" an error if a dependent form
+            // field is suddenly invalid because its previous data was invalid
+            // and a field it depends on just changed (e.g. user selected "Michigan"
+            // as a state, then the user changed "Country" from "USA" to "Mexico"
+            // and so now "Michigan" is invalid). In this case, we clear the error
+            // on the actual field, but store a "fake" error here, which won't be
+            // rendered, but will prevent the form from being valid.
+            if (!$this->form->has('__dynamic_error')) {
+                $this->form->add('__dynamic_error', HiddenType::class, [
+                    'mapped' => false,
+                    'error_bubbling' => false,
+                ]);
+            }
         }, 100);
 
-        $builder->addEventListener(FormEvents::POST_SUBMIT, function () {
+        $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
             $this->postSubmitDependencyData = [];
         });
+        // guarantee later than core ValidationListener
+        $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
+            $this->clearDataOnTransformationError($event);
+        }, -1);
     }
 
     public function addDependent(string $name, array $dependencies, callable $callback): self
@@ -77,6 +98,34 @@ class DynamicFormBuilder implements FormBuilderInterface, \IteratorAggregate
         $this->postSubmitDependencyData[$dependency] = $event->getForm()->getData();
 
         $this->executeReadyCallbacks($this->postSubmitDependencyData, FormEvents::POST_SUBMIT);
+    }
+
+    public function clearDataOnTransformationError(FormEvent $event): void
+    {
+        $form = $event->getForm();
+        $transformationErrorsCleared = false;
+        foreach ($this->dependentFieldConfigs as $dependentFieldConfig) {
+            if (!$form->has($dependentFieldConfig->name)) {
+                continue;
+            }
+
+            $subForm = $form->get($dependentFieldConfig->name);
+            if ($subForm->getTransformationFailure() && $subForm instanceof ClearableErrorsInterface) {
+                $subForm->clearErrors();
+                $transformationErrorsCleared = true;
+            }
+        }
+
+        if ($transformationErrorsCleared) {
+            // We've cleared the error, but the bad data remains on the field.
+            // We need to make sure that the form doesn't submit successfully,
+            // but we also don't want to render a validation error on any field.
+            // So, we jam the error into a hidden field, which doesn't render errors.
+            if ($form->get('__dynamic_error')->isValid()) {
+                $form->get('__dynamic_error')->addError(new FormError('Some dynamic fields have errors.'));
+            }
+            dump($form);
+        }
     }
 
     private function executeReadyCallbacks(array $availableDependencyData, string $eventName): void
@@ -129,7 +178,11 @@ class DynamicFormBuilder implements FormBuilderInterface, \IteratorAggregate
     }
 
     /*
-     * Pure method declarations below
+     * ----------------------------------------
+     *
+     * Pure decoration methods below.
+     *
+     * ----------------------------------------
      */
 
     public function count(): int
