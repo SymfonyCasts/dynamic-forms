@@ -1,5 +1,8 @@
 # Dynamic / Dependent Symfony Form Fields
 
+**NOTE**: This package is currently experimental. It seems to work great - but
+forms are complex! If you find a bug, please open an issue!
+
 Ever have a form field that depends on another?
 
 * Show a field only if another field is set to a specific value;
