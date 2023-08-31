@@ -1,5 +1,12 @@
 <?php
 
+/*
+ * This file is part of the SymfonyCasts DynamicForms package.
+ * Copyright (c) SymfonyCasts <https://symfonycasts.com/>
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfonycasts\DynamicForms\Tests;
 
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -74,7 +81,6 @@ class FunctionalTest extends KernelTestCase
             ->assertSee('Is Form Valid: no')
         ;
     }
-
 
     protected static function getKernelClass(): string
     {

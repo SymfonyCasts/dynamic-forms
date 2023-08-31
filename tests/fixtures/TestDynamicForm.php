@@ -1,5 +1,12 @@
 <?php
 
+/*
+ * This file is part of the SymfonyCasts DynamicForms package.
+ * Copyright (c) SymfonyCasts <https://symfonycasts.com/>
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfonycasts\DynamicForms\Tests\fixtures;
 
 use Symfony\Component\Form\AbstractType;
@@ -29,7 +36,7 @@ class TestDynamicForm extends AbstractType
         ]);
 
         // addDynamic(string $name, array $dependencies, callable $callback): self
-        $builder->addDependent('mainFood', ['meal'], function(DependentField $field, ?DynamicTestMeal $meal) {
+        $builder->addDependent('mainFood', ['meal'], function (DependentField $field, ?DynamicTestMeal $meal) {
             $field->add(EnumType::class, [
                 'class' => DynamicTestFood::class,
                 'placeholder' => null === $meal ? 'Select a meal first' : sprintf('What is for %s?', $meal->getReadable()),
@@ -39,7 +46,7 @@ class TestDynamicForm extends AbstractType
             ]);
         });
 
-        $builder->addDependent('pizzaSize', ['mainFood', 'upperCasePizzaSizes'], function(DependentField $field, ?DynamicTestFood $food, bool $upperCasePizzaSizes) {
+        $builder->addDependent('pizzaSize', ['mainFood', 'upperCasePizzaSizes'], function (DependentField $field, ?DynamicTestFood $food, bool $upperCasePizzaSizes) {
             if (DynamicTestFood::Pizza !== $food) {
                 return;
             }
