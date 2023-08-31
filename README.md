@@ -10,7 +10,7 @@ Ever have a form field that depends on another?
 * Have multiple-level dependencies (e.g. field A depends on field B
   which depends on field C).
 
-```
+```php
 public function buildForm(FormBuilderInterface $builder, array $options): void
 {
     $builder = new DynamicFormBuilder($builder);
