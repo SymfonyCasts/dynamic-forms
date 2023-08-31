@@ -12,14 +12,15 @@
     ],
     "require": {
         "php": ">=8.1",
-        "symfony/form": "^6.3"
+        "symfony/form": "^5.4|^6.3|^7.0"
     },
     "require-dev": {
-        "symfony/framework-bundle": "^6.3",
-        "symfony/phpunit-bridge": "^6.3",
-        "phpstan/phpstan": "1.11.x-dev",
-        "zenstruck/browser": "1.x-dev",
-        "symfony/twig-bundle": "7.0.x-dev"
+        "symfony/framework-bundle": "^6.3|^7.0",
+        "symfony/phpunit-bridge": "^5.4|^6.3|^7.0",
+        "phpstan/phpstan": "^1.11",
+        "zenstruck/browser": "^1.4",
+        "symfony/twig-bundle": "^6.3|^7.0",
+        "twig/twig": "^2.15|^3.0"
     },
     "minimum-stability": "dev",
     "autoload": {
