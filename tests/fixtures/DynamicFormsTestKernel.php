@@ -59,6 +59,10 @@ class DynamicFormsTestKernel extends Kernel
             'secret' => 'foo000',
             'http_method_override' => false,
             'test' => true,
+            'handle_all_throwables' => true,
+            'php_errors' => [
+                'log' => true,
+            ],
         ]);
 
         $container->extension('twig', [
