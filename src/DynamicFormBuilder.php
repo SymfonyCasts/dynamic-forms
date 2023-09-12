@@ -191,7 +191,7 @@ class DynamicFormBuilder implements FormBuilderInterface, \IteratorAggregate
         return $this->builder->count();
     }
 
-    public function add(/*string|FormBuilderInterface */$child, string $type = null, array $options = []): static
+    public function add(/* string|FormBuilderInterface */ $child, string $type = null, array $options = []): static
     {
         $this->builder->add($child, $type, $options);
 
