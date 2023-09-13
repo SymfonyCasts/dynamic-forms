@@ -19,8 +19,9 @@
         "symfony/phpunit-bridge": "^5.4|^6.3|^7.0",
         "phpstan/phpstan": "^1.11",
         "zenstruck/browser": "^1.4",
-        "symfony/twig-bundle": "^6.3|^7.0",
-        "twig/twig": "^2.15|^3.0"
+        "symfony/twig-bundle": "^5.4|^6.3|^7.0",
+        "twig/twig": "^2.15|^3.0",
+        "symfony/options-resolver": "^5.4|^6.3|^7.0"
     },
     "minimum-stability": "dev",
     "autoload": {

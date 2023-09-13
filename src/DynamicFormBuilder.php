@@ -191,7 +191,10 @@ class DynamicFormBuilder implements FormBuilderInterface, \IteratorAggregate
         return $this->builder->count();
     }
 
-    public function add(string|FormBuilderInterface $child, string $type = null, array $options = []): static
+    /**
+     * @param string|FormBuilderInterface $child
+     */
+    public function add($child, string $type = null, array $options = []): static
     {
         $this->builder->add($child, $type, $options);
 
@@ -286,7 +289,7 @@ class DynamicFormBuilder implements FormBuilderInterface, \IteratorAggregate
         return $this;
     }
 
-    public function setDataMapper(?DataMapperInterface $dataMapper): static
+    public function setDataMapper(DataMapperInterface $dataMapper = null): static
     {
         $this->builder->setDataMapper($dataMapper);
 
@@ -335,7 +338,10 @@ class DynamicFormBuilder implements FormBuilderInterface, \IteratorAggregate
         return $this;
     }
 
-    public function setPropertyPath(null|string|PropertyPathInterface $propertyPath): static
+    /**
+     * @param string|PropertyPathInterface|null $propertyPath
+     */
+    public function setPropertyPath($propertyPath): static
     {
         $this->builder->setPropertyPath($propertyPath);
 
