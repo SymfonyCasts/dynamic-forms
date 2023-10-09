@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2023-09-22T11:03:40Z
+
+Thanks for this Victor - you're totally right we need to make sure 5.4 is actually being tested.
+
+Can you rebase now that #7 is merged? Then we can see if things are passing
+
+> Seems we also need to add "symfony/options-resolver": "^5.4|^6.3|^7.0" to the dev deps to fix deprecations
+
+Yea, I think I see them - under `Remaining indirect deprecation notices (7)` - I'm not sure if those are actually a problem and will make the tests fail. But if they do, sure, we should add this line to fix them.
+
+---------------------------------------------------------------------------
+
+by bocharsky-bw at 2023-09-22T11:56:36Z
+
+@weaverryan as you can see deprecations cause builds to fail, so I added that `symfony/options-resolver` dep too. Now all green :)
