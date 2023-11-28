@@ -164,4 +164,3 @@ the HTML on the page.
 
 This is a non-trivial task and there may be room for improvement in this
 library to make this easier. If you have ideas, please open an issue!
-
