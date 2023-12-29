@@ -155,55 +155,77 @@ it will automatically re-render when the form changes.
 
 ### B) Use [Symfony UX Turbo](https://symfony.com/bundles/ux-turbo/current/index.html#decomposing-complex-pages-with-turbo-frames)
 
-By using turbo frames you can have a dynamic form running quickly without any JavaScript.
+If you are already using Symfony UX Turbo on your website, you can have a dynamic form running quickly without any JavaScript.
+
+Or you may want to install Symfony UX Turbo, [check out the documentation](https://symfony.com/bundles/ux-turbo/current/index.html#installation).
+
+> [!NOTE]
+> You only need to have Turbo Frame, you can disable Turbo Drive if you do not use it, or do not want to use it.
+> ie: `Turbo.session.drive = false;`
 
 Simply add a `<turbo-frame>` around your form:
 
 ```twig
 <turbo-frame id="rating-form">
-{{ form_start(form) }}
-    {{ form_row(form.rating) }}
-
-    {% if form.badRatingNotes is defined %}
-        {{ form_row(form.badRatingNotes) }}
-    {% endif %}
-    {# We also add a real submit button #}
-    {{ form_row(form.submit) }}
-{{ form_end(form) }}
+    {{ form(form) }}
 </turbo-frame>
 ```
 
 From here you need two small changes:
 
 First, in your form type:
+ - You need to add an attribute on the choice field, so it auto-submits the form when changed (may need to be adapted to your own form if more complex)
+ - Add a submit button, so in the controller you can differenciate from an auto-submit versus a user action
 
-```php
+
+```diff
 // src/Form/FeedbackForm.php
 
 // ...
 
-    $builder->add('rating', ChoiceType::class, [
-        'choices' => [
-            'Select a rating' => null,
-            'Great' => 5,
-            'Good' => 4,
-            'Okay' => 3,
-            'Bad' => 2,
-            'Terrible' => 1
-        ],
-        // This will allow the form to auto-submit on value change
-        'attr' => ['onchange' => 'this.form.submit()'],
-    ]);
-    // This will allow to differenciate between a user submition and an auto-submit
-    $builder->add('submit', SubmitType::class, [
-        'attr' => ['value' => 'submit'], // Needed for turbo
-    ]);
+class FeedbackForm extends AbstractType
+{
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        $builder =  new DynamicFormBuilder($builder);
 
+        $builder->add('rating', ChoiceType::class, [
+            'choices' => [
+                'Select a rating' => null,
+                'Great' => 5,
+                'Good' => 4,
+                'Okay' => 3,
+                'Bad' => 2,
+                'Terrible' => 1
+            ],
++           // This will allow the form to auto-submit on value change
++           'attr' => ['onchange' => 'this.form.submit()'],
+        ]);
++       // This will allow to differenciate between a user submition and an auto-submit
++       $builder->add('submit', SubmitType::class, [
++           'attr' => ['value' => 'submit'], // Needed for Turbo
++       ]);
+
+        $builder->addDependent('badRatingNotes', 'rating', function(DependentField $field, ?int $rating) {
+            if (null === $rating || $rating >= 3) {
+                return; // field not needed
+            }
+
+            $field->add(TextareaType::class, [
+                'label' => 'What went wrong?',
+                'attr' => ['rows' => 3],
+                'help' => sprintf('Because you gave a %d rating, we\'d love to know what went wrong.', $rating),
+            ]);
+        });
+    }
+}
 ```
 
 Second, in your controller:
+ - Specify the action on your form, [this is needed for Turbo Frame](https://symfony.com/bundles/ux-turbo/current/index.html#3-form-response-code-changes)
+ - Handle the auto-submit by checking if the button has been clicked
 
-```php
+```diff
 // src/Controller/FeedbackController.php
 
     #[Route('/feedback', name: 'feedback')]
@@ -211,17 +233,19 @@ Second, in your controller:
     {
         //...
 
-        $feedbackForm = $this->createForm(FeedbackForm::class, options: [
-            'action' => $this->generateUrl('feedback'),
-        ]);
+-       $feedbackForm = $this->createForm(FeedbackForm::class);
++       $feedbackForm = $this->createForm(FeedbackForm::class, options: [
++           // This is needed by Turbo Frame, it is not specific to Dependent Symfony Form Fields
++           'action' => $this->generateUrl('feedback'),
++       ]);
         $feedbackForm->handleRequest($request);
         if ($feedbackForm->isSubmitted() && $feedbackForm->isValid()) {
 
-            /** @var SubmitButton $submitButton */
-            $submitButton = $feedbackForm->get('submit');
-            if (!$submitButton->isClicked()) {
-                return $this->render('feedback.html.twig', ['feedbackForm' => $feedbackForm]);
-            }
++           /** @var SubmitButton $submitButton */
++           $submitButton = $feedbackForm->get('submit');
++           if (!$submitButton->isClicked()) {
++               return $this->render('feedback.html.twig', ['feedbackForm' => $feedbackForm]);
++           }
 
             // Your code here
             // ...
