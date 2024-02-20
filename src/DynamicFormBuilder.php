@@ -152,7 +152,7 @@ class DynamicFormBuilder implements FormBuilderInterface, \IteratorAggregate
         }
     }
 
-    private function initializeListeners(array $fieldsToConsider = null): void
+    private function initializeListeners(?array $fieldsToConsider = null): void
     {
         $registeredFields = [];
         foreach ($this->dependentFieldConfigs as $dynamicField) {
@@ -194,14 +194,14 @@ class DynamicFormBuilder implements FormBuilderInterface, \IteratorAggregate
     /**
      * @param string|FormBuilderInterface $child
      */
-    public function add($child, string $type = null, array $options = []): static
+    public function add($child, ?string $type = null, array $options = []): static
     {
         $this->builder->add($child, $type, $options);
 
         return $this;
     }
 
-    public function create(string $name, string $type = null, array $options = []): FormBuilderInterface
+    public function create(string $name, ?string $type = null, array $options = []): FormBuilderInterface
     {
         return $this->builder->create($name, $type, $options);
     }
@@ -289,7 +289,7 @@ class DynamicFormBuilder implements FormBuilderInterface, \IteratorAggregate
         return $this;
     }
 
-    public function setDataMapper(DataMapperInterface $dataMapper = null): static
+    public function setDataMapper(?DataMapperInterface $dataMapper = null): static
     {
         $this->builder->setDataMapper($dataMapper);
 
