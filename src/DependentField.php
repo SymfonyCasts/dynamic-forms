@@ -20,7 +20,7 @@ class DependentField
     private array $options = [];
     private bool $shouldBeAdded = false;
 
-    public function add(string $type = null, array $options = []): static
+    public function add(?string $type = null, array $options = []): static
     {
         $this->type = $type;
         $this->options = $options;
