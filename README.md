@@ -199,7 +199,7 @@ class FeedbackForm extends AbstractType
                 'Terrible' => 1
             ],
 +           // This will allow the form to auto-submit on value change
-+           'attr' => ['onchange' => 'this.form.submit()'],
++           'attr' => ['onchange' => 'this.form.requestSubmit()'],
         ]);
 +       // This will allow to differenciate between a user submition and an auto-submit
 +       $builder->add('submit', SubmitType::class, [
