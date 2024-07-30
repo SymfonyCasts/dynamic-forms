@@ -31,7 +31,7 @@ class DependentFieldConfig
     public function isReady(array $availableDependencyData, string $eventName): bool
     {
         if (!\array_key_exists($eventName, $this->callbackExecuted)) {
-            throw new \InvalidArgumentException(sprintf('Invalid event name "%s"', $eventName));
+            throw new \InvalidArgumentException(\sprintf('Invalid event name "%s"', $eventName));
         }
 
         if ($this->callbackExecuted[$eventName]) {

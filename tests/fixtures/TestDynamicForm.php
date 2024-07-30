@@ -39,7 +39,7 @@ class TestDynamicForm extends AbstractType
         $builder->addDependent('mainFood', ['meal'], function (DependentField $field, ?DynamicTestMeal $meal) {
             $field->add(EnumType::class, [
                 'class' => DynamicTestFood::class,
-                'placeholder' => null === $meal ? 'Select a meal first' : sprintf('What is for %s?', $meal->getReadable()),
+                'placeholder' => null === $meal ? 'Select a meal first' : \sprintf('What is for %s?', $meal->getReadable()),
                 'choices' => $meal?->getFoodChoices(),
                 'choice_label' => fn (DynamicTestFood $food): string => $food->getReadable(),
                 'disabled' => null === $meal,
