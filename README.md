@@ -5,6 +5,8 @@ forms are complex! If you find a bug, please open an issue!
 
 Ever have a form field that depends on another?
 
+You can find a [Demo with LiveComponent on Symfony UX](https://ux.symfony.com/demos/live-component/dependent-form-fields).
+
 * Show a field only if another field is set to a specific value;
 * Change the options of a field based on the value of another field;
 * Have multiple-level dependencies (e.g. field A depends on field B
