@@ -16,7 +16,7 @@
     },
     "require-dev": {
         "symfony/framework-bundle": "^6.3|^7.0",
-        "symfony/phpunit-bridge": "^5.4|^6.3.9|^7.0",
+        "symfony/phpunit-bridge": "^5.4.32|^6.3.9|^7.0",
         "zenstruck/browser": "^1.4",
         "symfony/twig-bundle": "^5.4|^6.3|^7.0",
         "twig/twig": "^2.15|^3.0",
