@@ -1,5 +1,7 @@
 # Dynamic / Dependent Symfony Form Fields
 
+[![CI](https://github.com/SymfonyCasts/dynamic-forms/actions/workflows/ci.yaml/badge.svg)](https://github.com/SymfonyCasts/dynamic-forms/actions/workflows/ci.yaml)
+
 **NOTE**: This package is currently experimental. It seems to work great - but
 forms are complex! If you find a bug, please open an issue!
 
