@@ -20,10 +20,8 @@
         "zenstruck/browser": "^1.4",
         "symfony/twig-bundle": "^5.4|^6.3|^7.0",
         "twig/twig": "^2.15|^3.0",
-        "symfony/options-resolver": "^5.4|^6.3|^7.0"
-    },
-    "conflict": {
-        "phpunit/phpunit": ">=10"
+        "symfony/options-resolver": "^5.4|^6.3|^7.0",
+        "phpunit/phpunit": "^9.6"
     },
     "minimum-stability": "dev",
     "autoload": {
