@@ -137,6 +137,7 @@ class DynamicFormBuilder implements FormBuilderInterface, \IteratorAggregate
                 $name = $dependentFieldConfig->name;
 
                 if (!$dynamicField->shouldBeAdded()) {
+                    $availableDependencyData[$name] = null;
                     $this->form->remove($name);
 
                     continue;
