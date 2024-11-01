@@ -273,3 +273,96 @@ the HTML on the page.
 
 This is a non-trivial task and there may be room for improvement in this
 library to make this easier. If you have ideas, please open an issue!
+
+## Knowledge base - usage with third party libraries
+### Select2
+If you're using [Select2](https://select2.org/) that is instantiated on the page load, you may need to wrap it in a Stimulus controller to make it work when new fields dynamically pop up into your HTML DOM.  
+Example: [Symfony UX Turbo](https://symfony.com/bundles/ux-turbo/current/index.html#decomposing-complex-pages-with-turbo-frames) + [Custom stimulus controller](https://stimulus.hotwired.dev/reference/controllers)
+
+**_select2_controller.js_**
+```javascript
+// assets/controllers/select2_controller.js
+
+
+/* stimulusFetch: 'lazy' */
+import {Controller} from "@hotwired/stimulus";
+
+export default class extends Controller {
+
+    static values = {
+        allowClear: {type: Boolean, default: false},
+        placeholder: {type: String, default: null},
+        closeOnSelect: {type: Boolean, default: true}
+    }
+
+    get select() {
+        return jQuery(this.element);
+    }
+
+    connect() {
+        this.initBaseSelector(this.select)
+    }
+
+    disconnect() {
+        this.select.select2('destroy');
+    }
+
+    bindOnSelect2Event(select2) {
+
+        // Select2 and Stimulus with events
+        // https://symfony.com/bundles/ux-live-component/current/index.html#model-updates-don-t-work-when-external-javascript-changes-a-field
+        // https://symfony.com/bundles/ux-live-component/current/index.html#javascript-manual-element-change
+
+        select2.on('select2:select', function () {
+            let event = new Event('change', {bubbles: true})
+            this.dispatchEvent(event);
+        });
+
+        select2.on('select2:clear', function () {
+            let event = new Event('change', {bubbles: true})
+            this.dispatchEvent(event);
+        });
+    }
+    
+    initBaseSelector(select2) {
+
+        this.bindOnSelect2Event(select2);
+        
+        const options = {
+            closeOnSelect: this.closeOnSelectValue, 
+            minimumResultsForSearch: 3,
+            allowClear: this.allowClearValue,
+        }
+
+        if (this.placeholderValue != null) {
+            options['placeholder'] = this.placeholderValue
+        }
+
+        select2.select2(options);
+
+    }
+
+}
+```
+
+
+```php
+// src/Form/FeedbackForm.php
+
+$builder->addDependent('badRatingNotes', 'rating', function(DependentField $field, ?int $rating) {
+    if (null === $rating || $rating >= 3) {
+        return; // field not needed
+    }
+
+    $field->add(EntityType::class, [
+            'class' => BadRatingReason::class,
+            'help' => sprintf('Because you gave a %d rating, we\'d love to know what went wrong.', $rating),
+            'choice_label' => 'text',
+            'attr' => [
+                'data-controller' => 'select2',    
+                'data-select2-placeholder-value' => 'Select value',
+                'data-select2-allow-clear-value' => 'true',
+            ]
+    ]);
+});
+```
