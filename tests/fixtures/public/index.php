@@ -2,6 +2,13 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the SymfonyCasts DynamicForms package.
+ * Copyright (c) SymfonyCasts <https://symfonycasts.com/>
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfonycasts\DynamicForms\Tests\fixtures\DynamicFormsTestKernel;
 

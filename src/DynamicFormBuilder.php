@@ -137,7 +137,7 @@ class DynamicFormBuilder implements FormBuilderInterface, \IteratorAggregate
 
         while ($hasChanges && $iteration < $maxIterations) {
             $hasChanges = false;
-            $iteration++;
+            ++$iteration;
 
             // First pass: handle removals and reset dependent callbacks
             foreach ($this->dependentFieldConfigs as $dependentFieldConfig) {
@@ -186,7 +186,7 @@ class DynamicFormBuilder implements FormBuilderInterface, \IteratorAggregate
     }
 
     /**
-     * Remove fields that should no longer exist because their dependencies are missing
+     * Remove fields that should no longer exist because their dependencies are missing.
      */
     private function validateAndRemoveOrphanedFields(string $eventName): void
     {
@@ -218,12 +218,12 @@ class DynamicFormBuilder implements FormBuilderInterface, \IteratorAggregate
     }
 
     /**
-     * Reset callback execution status for fields that depend on a removed field
+     * Reset callback execution status for fields that depend on a removed field.
      */
     private function resetDependentCallbacks(string $removedFieldName, string $eventName): void
     {
         foreach ($this->dependentFieldConfigs as $dependentFieldConfig) {
-            if (in_array($removedFieldName, $dependentFieldConfig->dependencies)) {
+            if (\in_array($removedFieldName, $dependentFieldConfig->dependencies)) {
                 $dependentFieldConfig->callbackExecuted[$eventName] = false;
             }
         }

@@ -42,7 +42,7 @@ class DynamicFormsTestKernel extends Kernel
     }
 
     /**
-     * Verify that recursive dependencies are checked
+     * Verify that recursive dependencies are checked.
      */
     public function formPizzaSelected(Environment $twig, FormFactoryInterface $formFactory, Request $request): Response
     {
