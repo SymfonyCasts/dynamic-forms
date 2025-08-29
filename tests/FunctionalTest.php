@@ -82,6 +82,45 @@ class FunctionalTest extends KernelTestCase
         ;
     }
 
+    public function testRecursiveDynamicFields()
+    {
+        $browser = $this->pantherBrowser();
+        $browser->visit('/form-pizza-selected')
+            // check for the hidden field
+            ->assertSeeElement('#test_dynamic_form___dynamic_error')
+            ->assertSee('Is Form Valid: no')
+            ->assertSee('Pizza 🍕')
+            ->assertNotContains('<option value="bacon">')
+            ->assertContains('<option value="pizza" selected="selected">')
+            ->assertContains('What size pizza?')
+        ;
+
+        // now change the meal to breakfast
+        $browser->selectFieldOption('Meal', 'Breakfast')
+            ->click('Submit Form')
+            // form is not valid: the mainFood submitted an invalid value
+            ->assertSee('Is Form Valid: no')
+            ->assertContains('<option value="bacon">')
+            ->dump('form')
+            ->assertNotContains('<option value="pizza"')
+            ->assertNotContains('What size pizza?')
+        ;
+
+        // select a valid food for breakfast
+        $browser->selectFieldOption('Main food', 'Bacon')
+            ->click('Submit Form')
+            // form is valid again
+            ->assertSee('Is Form Valid: yes')
+        ;
+
+        // change the meal again
+        $browser->selectFieldOption('Meal', 'Lunch')
+            ->click('Submit Form')
+            // form is not valid: the mainFood=bacon is invalid for lunch
+            ->assertSee('Is Form Valid: no')
+        ;
+    }
+
     protected static function getKernelClass(): string
     {
         return DynamicFormsTestKernel::class;

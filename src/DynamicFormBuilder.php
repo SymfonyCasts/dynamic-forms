@@ -131,23 +131,90 @@ class DynamicFormBuilder implements FormBuilderInterface, \IteratorAggregate
 
     private function executeReadyCallbacks(array $availableDependencyData, string $eventName): void
     {
+        $hasChanges = true;
+        $maxIterations = 10;
+        $iteration = 0;
+
+        while ($hasChanges && $iteration < $maxIterations) {
+            $hasChanges = false;
+            $iteration++;
+
+            // First pass: handle removals and reset dependent callbacks
+            foreach ($this->dependentFieldConfigs as $dependentFieldConfig) {
+                if ($dependentFieldConfig->isReady($availableDependencyData, $eventName)) {
+                    $dynamicField = $dependentFieldConfig->execute($availableDependencyData, $eventName);
+                    $name = $dependentFieldConfig->name;
+                    $fieldExisted = $this->form->has($name);
+
+                    if (!$dynamicField->shouldBeAdded()) {
+                        if ($fieldExisted) {
+                            $this->form->remove($name);
+                            $hasChanges = true;
+
+                            // Reset callbacks for fields that depend on this removed field
+                            $this->resetDependentCallbacks($name, $eventName);
+                        }
+                        continue;
+                    }
+
+                    if (!$fieldExisted) {
+                        $this->builder->add($name, $dynamicField->getType(), $dynamicField->getOptions());
+                        $this->initializeListeners([$name]);
+                        // auto initialize mimics FormBuilder::getForm() behavior
+                        $field = $this->builder->get($name)->setAutoInitialize(false)->getForm();
+                        $this->form->add($field);
+                        $hasChanges = true;
+                    }
+                }
+            }
+
+            // If we had changes, we need to re-evaluate all dependencies that might now be invalid
+            if ($hasChanges) {
+                $this->validateAndRemoveOrphanedFields($eventName);
+            }
+        }
+    }
+
+    /**
+     * Remove fields that should no longer exist because their dependencies are missing
+     */
+    private function validateAndRemoveOrphanedFields(string $eventName): void
+    {
         foreach ($this->dependentFieldConfigs as $dependentFieldConfig) {
-            if ($dependentFieldConfig->isReady($availableDependencyData, $eventName)) {
-                $dynamicField = $dependentFieldConfig->execute($availableDependencyData, $eventName);
-                $name = $dependentFieldConfig->name;
+            $name = $dependentFieldConfig->name;
 
-                if (!$dynamicField->shouldBeAdded()) {
-                    $this->form->remove($name);
+            // If the field exists in the form, check if it should still exist
+            if ($this->form->has($name)) {
+                $hasAllDependencies = true;
 
-                    continue;
+                foreach ($dependentFieldConfig->dependencies as $dependency) {
+                    // Check if the dependency field exists and has appropriate data
+                    if (!$this->form->has($dependency)) {
+                        $hasAllDependencies = false;
+                        break;
+                    }
                 }
 
-                $this->builder->add($name, $dynamicField->getType(), $dynamicField->getOptions());
+                // If dependencies are missing, remove the field and reset its callback
+                if (!$hasAllDependencies) {
+                    $this->form->remove($name);
+                    $dependentFieldConfig->callbackExecuted[$eventName] = false;
 
-                $this->initializeListeners([$name]);
-                // auto initialize mimics FormBuilder::getForm() behavior
-                $field = $this->builder->get($name)->setAutoInitialize(false)->getForm();
-                $this->form->add($field);
+                    // Reset callbacks for fields that depend on this removed field
+                    $this->resetDependentCallbacks($name, $eventName);
+                }
+            }
+        }
+    }
+
+    /**
+     * Reset callback execution status for fields that depend on a removed field
+     */
+    private function resetDependentCallbacks(string $removedFieldName, string $eventName): void
+    {
+        foreach ($this->dependentFieldConfigs as $dependentFieldConfig) {
+            if (in_array($removedFieldName, $dependentFieldConfig->dependencies)) {
+                $dependentFieldConfig->callbackExecuted[$eventName] = false;
             }
         }
     }
