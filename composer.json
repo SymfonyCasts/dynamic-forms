@@ -22,7 +22,8 @@
         "twig/twig": "^2.15|^3.0",
         "symfony/options-resolver": "^5.4|^6.3|^7.0",
         "phpunit/phpunit": "^9.6",
-        "symfony/panther": "^2.2"
+        "symfony/panther": "^2.2",
+        "dbrekelmans/bdi": "dev-main"
     },
     "minimum-stability": "dev",
     "autoload": {
