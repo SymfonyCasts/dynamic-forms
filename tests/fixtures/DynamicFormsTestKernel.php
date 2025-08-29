@@ -20,6 +20,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
+use Symfonycasts\DynamicForms\Tests\fixtures\Enum\DynamicTestFood;
 use Symfonycasts\DynamicForms\Tests\fixtures\Enum\DynamicTestMeal;
 use Twig\Environment;
 
@@ -31,6 +32,23 @@ class DynamicFormsTestKernel extends Kernel
     {
         $form = $formFactory->create(TestDynamicForm::class, [
             'meal' => DynamicTestMeal::Breakfast,
+        ]);
+        $form->handleRequest($request);
+
+        return new Response($twig->render('form.html.twig', [
+            'form' => $form->createView(),
+            'isFormValid' => $form->isSubmitted() && $form->isValid(),
+        ]));
+    }
+
+    /**
+     * Verify that recursive dependencies are checked.
+     */
+    public function formPizzaSelected(Environment $twig, FormFactoryInterface $formFactory, Request $request): Response
+    {
+        $form = $formFactory->create(TestDynamicForm::class, [
+            'meal' => DynamicTestMeal::Dinner,
+            'mainFood' => DynamicTestFood::Pizza,
         ]);
         $form->handleRequest($request);
 
@@ -78,5 +96,6 @@ class DynamicFormsTestKernel extends Kernel
     protected function configureRoutes(RoutingConfigurator $routes): void
     {
         $routes->add('form', '/form')->controller('kernel::form');
+        $routes->add('form-pizza-selected', '/form-pizza-selected')->controller('kernel::formPizzaSelected');
     }
 }

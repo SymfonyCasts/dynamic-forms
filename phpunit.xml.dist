@@ -17,6 +17,12 @@
         <server name="SYMFONY_PHPUNIT_REMOVE" value="" />
         <server name="SYMFONY_PHPUNIT_VERSION" value="9.6" />
         <server name="SYMFONY_DEPRECATIONS_HELPER" value="max[indirect]=11" />
+        <server name="PANTHER_APP_ENV" value="1" force="true" />
+        <server name="PANTHER_WEB_SERVER_DIR" value="./tests/fixtures/public" force="true" />
+        <server name="BROWSER_SOURCE_DIR" value="./tests/fixtures/var/browser/source" force="true" />
+        <server name="BROWSER_SCREENSHOT_DIR" value="./tests/fixtures/var/browser/screenshots" force="true" />
+        <server name="BROWSER_CONSOLE_LOG_DIR" value="./tests/fixtures/var/browser/console-logs" force="true" />
+        <server name="PANTHER_NO_HEADLESS" value="1" force="true" />
     </php>
 
     <testsuites>
@@ -34,4 +40,8 @@
     <listeners>
         <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener" />
     </listeners>
+
+    <extensions>
+        <extension class="Zenstruck\Browser\Test\BrowserExtension" />
+    </extensions>
 </phpunit>
