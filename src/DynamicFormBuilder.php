@@ -157,12 +157,22 @@ class DynamicFormBuilder implements FormBuilderInterface, \IteratorAggregate
                         continue;
                     }
 
+                    // Field should be added - handle both new and existing fields
+                    if ($fieldExisted) {
+                        // Field exists but may need to be updated with new options
+                        // Remove and re-add to ensure proper configuration
+                        $this->form->remove($name);
+                        $hasChanges = true;
+                    }
+
+                    // Add/re-add the field with current configuration
+                    $this->builder->add($name, $dynamicField->getType(), $dynamicField->getOptions());
+                    $this->initializeListeners([$name]);
+                    // auto initialize mimics FormBuilder::getForm() behavior
+                    $field = $this->builder->get($name)->setAutoInitialize(false)->getForm();
+                    $this->form->add($field);
+
                     if (!$fieldExisted) {
-                        $this->builder->add($name, $dynamicField->getType(), $dynamicField->getOptions());
-                        $this->initializeListeners([$name]);
-                        // auto initialize mimics FormBuilder::getForm() behavior
-                        $field = $this->builder->get($name)->setAutoInitialize(false)->getForm();
-                        $this->form->add($field);
                         $hasChanges = true;
                     }
                 }
