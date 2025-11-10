@@ -12,18 +12,19 @@
     ],
     "require": {
         "php": ">=8.1",
-        "symfony/form": "^5.4|^6.3|^7.0"
+        "symfony/form": "^5.4|^6.3|^7.0|^8.0"
     },
     "require-dev": {
-        "symfony/framework-bundle": "^6.3|^7.0",
-        "symfony/phpunit-bridge": "^5.4.32|^6.3.9|^7.0",
+        "symfony/framework-bundle": "^6.3|^7.0|^8.0",
+        "symfony/phpunit-bridge": "^5.4.32|^6.3.9|^7.0|^8.0",
         "zenstruck/browser": "^1.4",
-        "symfony/twig-bundle": "^5.4|^6.3|^7.0",
+        "symfony/twig-bundle": "^5.4|^6.3|^7.0|^8.0",
         "twig/twig": "^2.15|^3.0",
-        "symfony/options-resolver": "^5.4|^6.3|^7.0",
+        "symfony/options-resolver": "^5.4|^6.3|^7.0|^8.0",
         "phpunit/phpunit": "^9.6"
     },
-    "minimum-stability": "dev",
+    "minimum-stability": "beta",
+    "prefer-stable": false,
     "autoload": {
         "psr-4": {
             "Symfonycasts\\DynamicForms\\": "src"
