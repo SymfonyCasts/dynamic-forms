@@ -23,7 +23,7 @@
         "symfony/options-resolver": "^5.4|^6.3|^7.0|^8.0",
         "phpunit/phpunit": "^9.6"
     },
-    "minimum-stability": "beta",
+    "minimum-stability": "dev",
     "prefer-stable": false,
     "autoload": {
         "psr-4": {
