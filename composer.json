@@ -24,7 +24,7 @@
         "phpunit/phpunit": "^9.6"
     },
     "minimum-stability": "dev",
-    "prefer-stable": false,
+    "prefer-stable": true,
     "autoload": {
         "psr-4": {
             "Symfonycasts\\DynamicForms\\": "src"
