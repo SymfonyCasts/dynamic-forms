@@ -18,7 +18,7 @@ class DependentFieldConfigTest extends TestCase
 {
     public function testIsReadyReturnsCorrectlyBasedOnDependencies(): void
     {
-        $fieldConfig = new DependentFieldConfig('state', ['country'], fn () => null);
+        $fieldConfig = new DependentFieldConfig('state', ['country'], static fn () => null);
         $this->assertFalse($fieldConfig->isReady([], FormEvents::PRE_SET_DATA));
         $this->assertTrue($fieldConfig->isReady(['country' => 'United States'], FormEvents::PRE_SET_DATA));
         $this->assertTrue($fieldConfig->isReady(['country' => 'United States'], FormEvents::POST_SUBMIT));
@@ -27,7 +27,7 @@ class DependentFieldConfigTest extends TestCase
 
     public function testIsReadyReturnFalseIfCallbackExecuted(): void
     {
-        $fieldConfig = new DependentFieldConfig('state', ['country'], fn () => null);
+        $fieldConfig = new DependentFieldConfig('state', ['country'], static fn () => null);
         $this->assertTrue($fieldConfig->isReady(['country' => 'United States'], FormEvents::PRE_SET_DATA));
         $fieldConfig->execute(['country' => 'United States'], FormEvents::PRE_SET_DATA);
         $this->assertFalse($fieldConfig->isReady(['country' => 'United States'], FormEvents::PRE_SET_DATA));
@@ -37,7 +37,7 @@ class DependentFieldConfigTest extends TestCase
     public function testExecuteCallsCallback(): void
     {
         $argsPassedToCallback = null;
-        $fieldConfig = new DependentFieldConfig('state', ['country', 'shouldHideRandomStates'], function ($configurableFormBuilder, $country, $shouldHideRandomStates) use (&$argsPassedToCallback) {
+        $fieldConfig = new DependentFieldConfig('state', ['country', 'shouldHideRandomStates'], static function ($configurableFormBuilder, $country, $shouldHideRandomStates) use (&$argsPassedToCallback) {
             $argsPassedToCallback = [$configurableFormBuilder, $country, $shouldHideRandomStates];
         });
         $fieldConfig->execute(['country' => 'United States', 'shouldHideRandomStates' => true], FormEvents::PRE_SET_DATA);

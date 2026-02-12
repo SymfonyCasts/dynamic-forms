@@ -27,7 +27,7 @@ class TestDynamicForm extends AbstractType
 
         $builder->add('meal', EnumType::class, [
             'class' => DynamicTestMeal::class,
-            'choice_label' => fn (DynamicTestMeal $meal): string => $meal->getReadable(),
+            'choice_label' => static fn (DynamicTestMeal $meal): string => $meal->getReadable(),
             'placeholder' => 'Which meal is it?',
         ]);
 
@@ -36,17 +36,17 @@ class TestDynamicForm extends AbstractType
         ]);
 
         // addDynamic(string $name, array $dependencies, callable $callback): self
-        $builder->addDependent('mainFood', ['meal'], function (DependentField $field, ?DynamicTestMeal $meal) {
+        $builder->addDependent('mainFood', ['meal'], static function (DependentField $field, ?DynamicTestMeal $meal) {
             $field->add(EnumType::class, [
                 'class' => DynamicTestFood::class,
                 'placeholder' => null === $meal ? 'Select a meal first' : \sprintf('What is for %s?', $meal->getReadable()),
                 'choices' => $meal?->getFoodChoices(),
-                'choice_label' => fn (DynamicTestFood $food): string => $food->getReadable(),
+                'choice_label' => static fn (DynamicTestFood $food): string => $food->getReadable(),
                 'disabled' => null === $meal,
             ]);
         });
 
-        $builder->addDependent('pizzaSize', ['mainFood', 'upperCasePizzaSizes'], function (DependentField $field, ?DynamicTestFood $food, bool $upperCasePizzaSizes) {
+        $builder->addDependent('pizzaSize', ['mainFood', 'upperCasePizzaSizes'], static function (DependentField $field, ?DynamicTestFood $food, bool $upperCasePizzaSizes) {
             if (DynamicTestFood::Pizza !== $food) {
                 return;
             }
@@ -54,7 +54,7 @@ class TestDynamicForm extends AbstractType
             $field->add(EnumType::class, [
                 'class' => DynamicTestPizzaSize::class,
                 'placeholder' => $upperCasePizzaSizes ? strtoupper('What size pizza?') : 'What size pizza?',
-                'choice_label' => fn (DynamicTestPizzaSize $pizzaSize): string => $upperCasePizzaSizes ? strtoupper($pizzaSize->getReadable()) : $pizzaSize->getReadable(),
+                'choice_label' => static fn (DynamicTestPizzaSize $pizzaSize): string => $upperCasePizzaSizes ? strtoupper($pizzaSize->getReadable()) : $pizzaSize->getReadable(),
                 'required' => true,
             ]);
         });

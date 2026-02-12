@@ -52,7 +52,7 @@ class DependentFieldConfig
         $configurableFormBuilder = new DependentField();
 
         $this->callbackExecuted[$eventName] = true;
-        $dependencyData = array_map(fn (string $dependency) => $availableDependencyData[$dependency], $this->dependencies);
+        $dependencyData = array_map(static fn (string $dependency) => $availableDependencyData[$dependency], $this->dependencies);
         $this->callback->__invoke($configurableFormBuilder, ...$dependencyData);
 
         return $configurableFormBuilder;
