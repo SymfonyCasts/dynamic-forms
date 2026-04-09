@@ -149,8 +149,8 @@ class DynamicFormBuilder implements FormBuilderInterface, \IteratorAggregate
                     $fieldBuilder->addModelTransformer($modelTransformer);
                 }
 
-                foreach ($dynamicField->getViewTransformers() as $modelTransformer) {
-                    $fieldBuilder->addViewTransformer($modelTransformer);
+                foreach ($dynamicField->getViewTransformers() as $viewTransformer) {
+                    $fieldBuilder->addViewTransformer($viewTransformer);
                 }
 
                 $this->initializeListeners([$name]);
