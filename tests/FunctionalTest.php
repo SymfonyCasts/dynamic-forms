@@ -17,7 +17,7 @@ class FunctionalTest extends KernelTestCase
 {
     use HasBrowser;
 
-    public function testDynamicFields()
+    public function testDynamicFields(): void
     {
         $browser = $this->browser();
         $browser->visit('/form')
