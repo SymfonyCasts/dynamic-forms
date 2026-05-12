@@ -9,6 +9,8 @@
 
 namespace Symfonycasts\DynamicForms;
 
+use Symfony\Component\Form\DataTransformerInterface;
+
 /**
  * Used to configure a dependent/dynamic field.
  *
@@ -19,6 +21,16 @@ class DependentField
     private ?string $type = null;
     private array $options = [];
     private bool $shouldBeAdded = false;
+
+    /**
+     * @var DataTransformerInterface[]
+     */
+    private array $modelTransformers;
+
+    /**
+     * @var DataTransformerInterface[]
+     */
+    private array $viewTransformers;
 
     public function add(?string $type = null, array $options = []): static
     {
@@ -42,5 +54,35 @@ class DependentField
     public function shouldBeAdded(): bool
     {
         return $this->shouldBeAdded;
+    }
+
+    public function addModelTransformer(DataTransformerInterface $transformer): self
+    {
+        $this->modelTransformers[] = $transformer;
+
+        return $this;
+    }
+
+    /**
+     * @return DataTransformerInterface[]
+     */
+    public function getModelTransformers(): array
+    {
+        return $this->modelTransformers;
+    }
+
+    public function addViewTransformer(DataTransformerInterface $transformer): self
+    {
+        $this->viewTransformers[] = $transformer;
+
+        return $this;
+    }
+
+    /**
+     * @return DataTransformerInterface[]
+     */
+    public function getViewTransformers(): array
+    {
+        return $this->viewTransformers;
     }
 }
