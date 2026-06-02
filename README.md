@@ -273,3 +273,7 @@ the HTML on the page.
 
 This is a non-trivial task and there may be room for improvement in this
 library to make this easier. If you have ideas, please open an issue!
+
+## Security Policy
+
+If you discover a security vulnerability, please do not open a public issue or pull request. Instead, please review this repository's [Security Policy](https://github.com/SymfonyCasts/dynamic-forms/security) for instructions on how to report it responsibly.
