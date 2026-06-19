@@ -143,11 +143,21 @@ class DynamicFormBuilder implements FormBuilderInterface, \IteratorAggregate
                 }
 
                 $this->builder->add($name, $dynamicField->getType(), $dynamicField->getOptions());
+                $fieldBuilder = $this->builder->get($name);
+
+                foreach ($dynamicField->getModelTransformers() as $modelTransformer) {
+                    $fieldBuilder->addModelTransformer($modelTransformer);
+                }
+
+                foreach ($dynamicField->getViewTransformers() as $viewTransformer) {
+                    $fieldBuilder->addViewTransformer($viewTransformer);
+                }
 
                 $this->initializeListeners([$name]);
                 // auto initialize mimics FormBuilder::getForm() behavior
-                $field = $this->builder->get($name)->setAutoInitialize(false)->getForm();
-                $this->form->add($field);
+                $fieldBuilder->setAutoInitialize(false);
+
+                $this->form->add($fieldBuilder->getForm());
             }
         }
     }
