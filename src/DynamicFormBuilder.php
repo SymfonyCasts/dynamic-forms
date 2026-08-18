@@ -46,11 +46,19 @@ class DynamicFormBuilder implements FormBuilderInterface, \IteratorAggregate
     private array $preSetDataDependencyData = [];
     private array $postSubmitDependencyData = [];
 
+    /**
+     * Names of the dependencies whose submitted data differs from their initial data.
+     *
+     * @var string[]
+     */
+    private array $changedDependencies = [];
+
     public function __construct(private FormBuilderInterface $builder)
     {
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
             $this->form = $event->getForm();
             $this->preSetDataDependencyData = [];
+            $this->changedDependencies = [];
             $this->initializeListeners();
 
             // A fake hidden field where we can "store" an error if a dependent form
@@ -74,6 +82,7 @@ class DynamicFormBuilder implements FormBuilderInterface, \IteratorAggregate
         // guarantee later than core ValidationListener
         $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
             $this->clearDataOnTransformationError($event);
+            $this->clearErrorsOnEmptiedDependentFields($event);
         }, -1);
     }
 
@@ -99,6 +108,16 @@ class DynamicFormBuilder implements FormBuilderInterface, \IteratorAggregate
         $dependency = $event->getForm()->getName();
         $this->postSubmitDependencyData[$dependency] = $event->getForm()->getData();
 
+        // remember which dependencies changed during this submit: a dependent
+        // field whose dependency just changed is expected to be emptied by the
+        // UI, so its validation errors should not be rendered (see below)
+        if (\array_key_exists($dependency, $this->preSetDataDependencyData)
+            && $this->preSetDataDependencyData[$dependency] != $this->postSubmitDependencyData[$dependency]
+            && !\in_array($dependency, $this->changedDependencies, true)
+        ) {
+            $this->changedDependencies[] = $dependency;
+        }
+
         $this->executeReadyCallbacks($this->postSubmitDependencyData, FormEvents::POST_SUBMIT);
     }
 
@@ -123,9 +142,57 @@ class DynamicFormBuilder implements FormBuilderInterface, \IteratorAggregate
             // We need to make sure that the form doesn't submit successfully,
             // but we also don't want to render a validation error on any field.
             // So, we jam the error into a hidden field, which doesn't render errors.
-            if ($form->get('__dynamic_error')->isValid()) {
-                $form->get('__dynamic_error')->addError(new FormError('Some dynamic fields have errors.'));
+            $this->addHiddenError($form);
+        }
+    }
+
+    /**
+     * Hides the validation errors of a dependent field that was emptied because
+     * a field it depends on just changed (e.g. user selected "Pizza" as the main
+     * food, then changed "Meal" back and forth: "mainFood" is re-rendered empty,
+     * so a NotBlank-style violation on it is only noise). Like for transformation
+     * failures above, the error is moved to the hidden field: nothing is
+     * rendered, but the form remains invalid.
+     */
+    public function clearErrorsOnEmptiedDependentFields(FormEvent $event): void
+    {
+        if (!$this->changedDependencies) {
+            return;
+        }
+
+        $form = $event->getForm();
+        $errorsCleared = false;
+        foreach ($this->dependentFieldConfigs as $dependentFieldConfig) {
+            if (!array_intersect($dependentFieldConfig->dependencies, $this->changedDependencies)) {
+                continue;
             }
+
+            if (!$form->has($dependentFieldConfig->name)) {
+                continue;
+            }
+
+            $subForm = $form->get($dependentFieldConfig->name);
+            if (!$subForm instanceof ClearableErrorsInterface || !$subForm->isEmpty()) {
+                continue;
+            }
+
+            if (0 === \count($subForm->getErrors(false))) {
+                continue;
+            }
+
+            $subForm->clearErrors();
+            $errorsCleared = true;
+        }
+
+        if ($errorsCleared) {
+            $this->addHiddenError($form);
+        }
+    }
+
+    private function addHiddenError(FormInterface $form): void
+    {
+        if ($form->get('__dynamic_error')->isValid()) {
+            $form->get('__dynamic_error')->addError(new FormError('Some dynamic fields have errors.'));
         }
     }
 
