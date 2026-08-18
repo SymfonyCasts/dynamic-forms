@@ -40,6 +40,19 @@ class DynamicFormsTestKernel extends Kernel
         ]));
     }
 
+    public function constrainedForm(Environment $twig, FormFactoryInterface $formFactory, Request $request): Response
+    {
+        $form = $formFactory->create(TestConstrainedDynamicForm::class, [
+            'meal' => DynamicTestMeal::Breakfast,
+        ]);
+        $form->handleRequest($request);
+
+        return new Response($twig->render('form.html.twig', [
+            'form' => $form->createView(),
+            'isFormValid' => $form->isSubmitted() && $form->isValid(),
+        ]));
+    }
+
     public function registerBundles(): iterable
     {
         return [
@@ -78,5 +91,6 @@ class DynamicFormsTestKernel extends Kernel
     protected function configureRoutes(RoutingConfigurator $routes): void
     {
         $routes->add('form', '/form')->controller('kernel::form');
+        $routes->add('constrained_form', '/constrained-form')->controller('kernel::constrainedForm');
     }
 }
