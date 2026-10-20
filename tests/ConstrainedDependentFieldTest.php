@@ -11,6 +11,8 @@ namespace Symfonycasts\DynamicForms\Tests;
 
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfonycasts\DynamicForms\Tests\fixtures\DynamicFormsTestKernel;
+use Symfonycasts\DynamicForms\Tests\fixtures\Enum\DynamicTestMeal;
+use Symfonycasts\DynamicForms\Tests\fixtures\TestConstrainedDynamicForm;
 use Zenstruck\Browser\Test\HasBrowser;
 
 /**
@@ -41,7 +43,7 @@ class ConstrainedDependentFieldTest extends KernelTestCase
         $browser->selectFieldOption('Meal', 'Breakfast')
             ->click('Submit Form')
             ->assertSee('Is Form Valid: no')
-            ->assertNotContains('<li')
+            ->assertNotSee('This food is not served at this meal.')
         ;
 
         // change the meal back: "mainFood" is submitted empty, its NotBlank
@@ -49,7 +51,7 @@ class ConstrainedDependentFieldTest extends KernelTestCase
         $browser->selectFieldOption('Meal', 'Dinner')
             ->click('Submit Form')
             ->assertSee('Is Form Valid: no')
-            ->assertNotContains('<li')
+            ->assertNotSee('This value should not be blank.')
         ;
 
         // selecting a food again makes the form valid
@@ -69,6 +71,36 @@ class ConstrainedDependentFieldTest extends KernelTestCase
             ->assertSee('Is Form Valid: no')
             ->assertSee('This value should not be blank.')
         ;
+    }
+
+    public function testErrorIsRenderedOnSubmitAfterDependencyChangedInPreviousRender(): void
+    {
+        $browser = $this->browser()
+            ->visit('/constrained-form')
+            ->selectFieldOption('Meal', 'Dinner')
+            ->click('Submit Form') // re-render after the dependency changed: fine to hide
+            ->assertNotSee('This value should not be blank.')
+        ;
+
+        // Meal is still "Dinner", the user submits without picking a food
+        $browser->click('Submit Form')
+            ->assertSee('Is Form Valid: no')
+            ->assertSee('This value should not be blank.')
+        ;
+    }
+
+    public function testErrorIsRenderedWhenTheRenderedStateIsMissing(): void
+    {
+        $form = self::getContainer()->get('form.factory')->create(TestConstrainedDynamicForm::class, [
+            'meal' => DynamicTestMeal::Breakfast,
+        ]);
+
+        // "meal" changed, but without the rendered state there is no way to
+        // know it: the error must not be hidden
+        $form->submit(['meal' => 'dinner', 'mainFood' => '']);
+
+        $this->assertFalse($form->isValid());
+        $this->assertCount(1, $form->get('mainFood')->getErrors());
     }
 
     protected static function getKernelClass(): string

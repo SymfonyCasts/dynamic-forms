@@ -37,6 +37,7 @@ class TestConstrainedDynamicForm extends AbstractType
                 'choices' => $meal?->getFoodChoices(),
                 'choice_label' => static fn (DynamicTestFood $food): string => $food->getReadable(),
                 'disabled' => null === $meal,
+                'invalid_message' => 'This food is not served at this meal.',
                 'constraints' => [new NotBlank()],
             ]);
         });

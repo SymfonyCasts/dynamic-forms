@@ -47,7 +47,8 @@ class DynamicFormBuilder implements FormBuilderInterface, \IteratorAggregate
     private array $postSubmitDependencyData = [];
 
     /**
-     * Names of the dependencies whose submitted data differs from their initial data.
+     * Names of the dependencies whose submitted value differs from the value
+     * rendered on the previous request.
      *
      * @var string[]
      */
@@ -74,7 +75,24 @@ class DynamicFormBuilder implements FormBuilderInterface, \IteratorAggregate
                     'error_bubbling' => false,
                 ]);
             }
+
+            // A fake hidden field carrying the values of the dependencies as
+            // they were rendered, so the next submit can tell which of them
+            // the user actually changed since the previous render.
+            if (!$this->form->has('__dynamic_state')) {
+                $this->form->add('__dynamic_state', HiddenType::class, [
+                    'mapped' => false,
+                ]);
+            }
         }, 100);
+
+        $builder->addEventListener(FormEvents::POST_SET_DATA, function (FormEvent $event) {
+            $this->storeRenderedDependencyState($event);
+        });
+
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
+            $this->detectChangedDependencies($event);
+        });
 
         $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
             $this->postSubmitDependencyData = [];
@@ -107,16 +125,6 @@ class DynamicFormBuilder implements FormBuilderInterface, \IteratorAggregate
     {
         $dependency = $event->getForm()->getName();
         $this->postSubmitDependencyData[$dependency] = $event->getForm()->getData();
-
-        // remember which dependencies changed during this submit: a dependent
-        // field whose dependency just changed is expected to be emptied by the
-        // UI, so its validation errors should not be rendered (see below)
-        if (\array_key_exists($dependency, $this->preSetDataDependencyData)
-            && $this->preSetDataDependencyData[$dependency] != $this->postSubmitDependencyData[$dependency]
-            && !\in_array($dependency, $this->changedDependencies, true)
-        ) {
-            $this->changedDependencies[] = $dependency;
-        }
 
         $this->executeReadyCallbacks($this->postSubmitDependencyData, FormEvents::POST_SUBMIT);
     }
@@ -154,7 +162,7 @@ class DynamicFormBuilder implements FormBuilderInterface, \IteratorAggregate
      * failures above, the error is moved to the hidden field: nothing is
      * rendered, but the form remains invalid.
      */
-    public function clearErrorsOnEmptiedDependentFields(FormEvent $event): void
+    private function clearErrorsOnEmptiedDependentFields(FormEvent $event): void
     {
         if (!$this->changedDependencies) {
             return;
@@ -187,6 +195,89 @@ class DynamicFormBuilder implements FormBuilderInterface, \IteratorAggregate
         if ($errorsCleared) {
             $this->addHiddenError($form);
         }
+    }
+
+    private function storeRenderedDependencyState(FormEvent $event): void
+    {
+        $form = $event->getForm();
+        $state = [];
+        foreach ($this->getDependencyNames() as $dependency) {
+            if ($form->has($dependency)) {
+                $state[$dependency] = $this->normalizeDependencyValue($form->get($dependency)->getViewData());
+            }
+        }
+
+        $form->get('__dynamic_state')->setData(json_encode($state));
+    }
+
+    /**
+     * Compares the submitted dependency values with the ones rendered on the
+     * previous request, then replaces the submitted state with the current
+     * values, so the next render carries them.
+     *
+     * Without a usable state (e.g. the field was not rendered), no dependency
+     * is considered changed: rendering an extra error is safer than silently
+     * blocking the submit.
+     */
+    private function detectChangedDependencies(FormEvent $event): void
+    {
+        $this->changedDependencies = [];
+
+        $data = $event->getData();
+        if (!\is_array($data)) {
+            return;
+        }
+
+        $previousState = \is_string($data['__dynamic_state'] ?? null) ? json_decode($data['__dynamic_state'], true) : null;
+
+        $currentState = [];
+        foreach ($this->getDependencyNames() as $dependency) {
+            if (!$event->getForm()->has($dependency)) {
+                continue;
+            }
+
+            $currentState[$dependency] = $this->normalizeDependencyValue($data[$dependency] ?? null);
+
+            if (\is_array($previousState)
+                && \array_key_exists($dependency, $previousState)
+                && $previousState[$dependency] !== $currentState[$dependency]
+            ) {
+                $this->changedDependencies[] = $dependency;
+            }
+        }
+
+        $data['__dynamic_state'] = json_encode($currentState);
+        $event->setData($data);
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getDependencyNames(): array
+    {
+        $dependencies = [];
+        foreach ($this->dependentFieldConfigs as $dependentFieldConfig) {
+            $dependencies = [...$dependencies, ...$dependentFieldConfig->dependencies];
+        }
+
+        return array_values(array_unique($dependencies));
+    }
+
+    /**
+     * Makes a rendered view value comparable with a raw submitted one: a
+     * missing or null value is submitted as an empty string.
+     */
+    private function normalizeDependencyValue(mixed $value): mixed
+    {
+        if (null === $value) {
+            return '';
+        }
+
+        if (\is_array($value)) {
+            return array_map(fn (mixed $item): mixed => $this->normalizeDependencyValue($item), $value);
+        }
+
+        return \is_scalar($value) ? (string) $value : $value;
     }
 
     private function addHiddenError(FormInterface $form): void
