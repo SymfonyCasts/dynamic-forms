@@ -55,15 +55,20 @@ class DynamicFormsTestKernel extends Kernel
 
     protected function configureContainer(ContainerConfigurator $container): void
     {
-        $container->extension('framework', [
+        $frameworkConfig = [
             'secret' => 'foo000',
             'http_method_override' => false,
             'test' => true,
-            'handle_all_throwables' => true,
             'php_errors' => [
                 'log' => true,
             ],
-        ]);
+        ];
+        // "handle_all_throwables" was introduced in Symfony 6.2
+        if (Kernel::VERSION_ID >= 60200) {
+            $frameworkConfig['handle_all_throwables'] = true;
+        }
+
+        $container->extension('framework', $frameworkConfig);
 
         $container->extension('twig', [
             'default_path' => '%kernel.project_dir%/templates',
