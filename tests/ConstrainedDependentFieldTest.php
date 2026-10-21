@@ -112,10 +112,12 @@ class ConstrainedDependentFieldTest extends KernelTestCase
 
     public function testErrorIsRenderedWhenADisabledDependencyIsNotSubmitted(): void
     {
-        $form = $this->createFormWithDependency(['b'], ['choices' => ['A' => 'a', 'B' => 'b'], 'disabled' => true]);
+        $depOptions = ['choices' => ['A' => 'a', 'B' => 'b'], 'disabled' => true];
+        $renderedState = $this->renderDynamicState('b', $depOptions);
 
         // browsers do not submit disabled fields, Symfony keeps "b"
-        $form->submit(['notes' => '', '__dynamic_state' => '{"dep":"b"}']);
+        $form = $this->createFormWithDependency('b', $depOptions);
+        $form->submit(['notes' => '', '__dynamic_state' => $renderedState]);
 
         $this->assertFalse($form->isValid());
         $this->assertCount(1, $form->get('notes')->getErrors());
@@ -123,22 +125,26 @@ class ConstrainedDependentFieldTest extends KernelTestCase
 
     public function testErrorIsRenderedWhenAnEmptyMultipleDependencyIsNotSubmitted(): void
     {
-        $form = $this->createFormWithDependency([[]], ['choices' => ['A' => 'a', 'B' => 'b'], 'multiple' => true]);
+        $depOptions = ['choices' => ['A' => 'a', 'B' => 'b'], 'multiple' => true];
+        $renderedState = $this->renderDynamicState([], $depOptions);
 
         // browsers omit a multiple choice field with nothing selected
-        $form->submit(['notes' => '', '__dynamic_state' => '{"dep":[]}']);
+        $form = $this->createFormWithDependency([], $depOptions);
+        $form->submit(['notes' => '', '__dynamic_state' => $renderedState]);
 
         $this->assertFalse($form->isValid());
         $this->assertCount(1, $form->get('notes')->getErrors());
     }
 
-    /**
-     * @param array{0: mixed} $depData
-     */
-    private function createFormWithDependency(array $depData, array $depOptions): FormInterface
+    private function renderDynamicState(mixed $depData, array $depOptions): string
+    {
+        return $this->createFormWithDependency($depData, $depOptions)->createView()['__dynamic_state']->vars['value'];
+    }
+
+    private function createFormWithDependency(mixed $depData, array $depOptions): FormInterface
     {
         $builder = new DynamicFormBuilder(
-            self::getContainer()->get('form.factory')->createBuilder(FormType::class, ['dep' => $depData[0]])
+            self::getContainer()->get('form.factory')->createBuilder(FormType::class, ['dep' => $depData])
         );
         $builder->add('dep', ChoiceType::class, $depOptions);
         $builder->addDependent('notes', ['dep'], static function (DependentField $field) {
