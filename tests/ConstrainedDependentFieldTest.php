@@ -10,6 +10,13 @@
 namespace Symfonycasts\DynamicForms\Tests;
 
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfonycasts\DynamicForms\DependentField;
+use Symfonycasts\DynamicForms\DynamicFormBuilder;
 use Symfonycasts\DynamicForms\Tests\fixtures\DynamicFormsTestKernel;
 use Symfonycasts\DynamicForms\Tests\fixtures\Enum\DynamicTestMeal;
 use Symfonycasts\DynamicForms\Tests\fixtures\TestConstrainedDynamicForm;
@@ -101,6 +108,44 @@ class ConstrainedDependentFieldTest extends KernelTestCase
 
         $this->assertFalse($form->isValid());
         $this->assertCount(1, $form->get('mainFood')->getErrors());
+    }
+
+    public function testErrorIsRenderedWhenADisabledDependencyIsNotSubmitted(): void
+    {
+        $form = $this->createFormWithDependency(['b'], ['choices' => ['A' => 'a', 'B' => 'b'], 'disabled' => true]);
+
+        // browsers do not submit disabled fields, Symfony keeps "b"
+        $form->submit(['notes' => '', '__dynamic_state' => '{"dep":"b"}']);
+
+        $this->assertFalse($form->isValid());
+        $this->assertCount(1, $form->get('notes')->getErrors());
+    }
+
+    public function testErrorIsRenderedWhenAnEmptyMultipleDependencyIsNotSubmitted(): void
+    {
+        $form = $this->createFormWithDependency([[]], ['choices' => ['A' => 'a', 'B' => 'b'], 'multiple' => true]);
+
+        // browsers omit a multiple choice field with nothing selected
+        $form->submit(['notes' => '', '__dynamic_state' => '{"dep":[]}']);
+
+        $this->assertFalse($form->isValid());
+        $this->assertCount(1, $form->get('notes')->getErrors());
+    }
+
+    /**
+     * @param array{0: mixed} $depData
+     */
+    private function createFormWithDependency(array $depData, array $depOptions): FormInterface
+    {
+        $builder = new DynamicFormBuilder(
+            self::getContainer()->get('form.factory')->createBuilder(FormType::class, ['dep' => $depData[0]])
+        );
+        $builder->add('dep', ChoiceType::class, $depOptions);
+        $builder->addDependent('notes', ['dep'], static function (DependentField $field) {
+            $field->add(TextType::class, ['constraints' => [new NotBlank()]]);
+        });
+
+        return $builder->getForm();
     }
 
     protected static function getKernelClass(): string

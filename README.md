@@ -271,6 +271,11 @@ form to its usual endpoint (or any endpoint that will submit the form), take
 the HTML response, extract the parts that need to be re-rendered and then replace
 the HTML on the page.
 
+Make sure to also replace the hidden `__dynamic_state` field: it holds the values
+of the dependencies as they were rendered. If it keeps the state of the first
+render, the validation errors of the dependent fields will be hidden again on
+the next submit.
+
 This is a non-trivial task and there may be room for improvement in this
 library to make this easier. If you have ideas, please open an issue!
 

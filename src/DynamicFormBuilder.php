@@ -236,11 +236,20 @@ class DynamicFormBuilder implements FormBuilderInterface, \IteratorAggregate
                 continue;
             }
 
+            // browsers do not submit disabled fields, and Symfony ignores
+            // their submitted data anyway: such a dependency cannot change
+            $dependencyForm = $event->getForm()->get($dependency);
+            if ($dependencyForm->isDisabled()) {
+                $currentState[$dependency] = $this->normalizeDependencyValue($dependencyForm->getViewData());
+
+                continue;
+            }
+
             $currentState[$dependency] = $this->normalizeDependencyValue($data[$dependency] ?? null);
 
             if (\is_array($previousState)
                 && \array_key_exists($dependency, $previousState)
-                && $previousState[$dependency] !== $currentState[$dependency]
+                && $this->normalizeDependencyValue($previousState[$dependency]) !== $currentState[$dependency]
             ) {
                 $this->changedDependencies[] = $dependency;
             }
@@ -265,11 +274,12 @@ class DynamicFormBuilder implements FormBuilderInterface, \IteratorAggregate
 
     /**
      * Makes a rendered view value comparable with a raw submitted one: a
-     * missing or null value is submitted as an empty string.
+     * missing or null value is submitted as an empty string, and so is a
+     * multiple choice with nothing selected, which browsers omit entirely.
      */
     private function normalizeDependencyValue(mixed $value): mixed
     {
-        if (null === $value) {
+        if (null === $value || [] === $value) {
             return '';
         }
 
